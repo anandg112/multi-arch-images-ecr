@@ -15,8 +15,8 @@ jobs:
   build:
     strategy: 
       matrix:
-        arch: [arm64, x86]
-
+        arch: [arm, amd]
+        
     runs-on: ubuntu-24.04-${{ matrix.arch }}
 
     permissions: 
@@ -32,6 +32,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: github-actions-oidc
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
