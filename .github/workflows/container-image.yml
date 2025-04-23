@@ -1,7 +1,7 @@
 name: Docker
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
   push:
     branches: ["main"]
     # publish semver tags as releases
@@ -15,10 +15,8 @@ jobs:
   build:
     strategy: 
       matrix:
-        arch: [arm, amd]
-        
-    runs-on: ubuntu-24.04-${{ matrix.arch }}
-
+        arch: [arm64, amd64]
+    runs-on: ubuntu-24.04
     permissions: 
       contents: read
       id-token: write
@@ -36,7 +34,6 @@ jobs:
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
-        if: github.event_name == 'pull_request'
         id: login-to-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
@@ -53,6 +50,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/${{ matrix.arch }}
           push : ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}-${{ matrix.arch }}
           labels: ${{ steps.meta.outputs.labels }}
